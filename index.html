@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>macOS Kalkulyator</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		body {
+			background-color: #f3f4f6;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+		}
+
+		.calculator {
+			background-color: #2d2d2d;
+			border-radius: 12px;
+			padding: 20px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			width: 320px;
+			margin: 40px auto;
+		}
+
+		#display {
+			width: 100%;
+			background-color: #1c2526;
+			color: white;
+			font-size: 2.5rem;
+			text-align: right;
+			padding: 15px;
+			border-radius: 8px;
+			margin-bottom: 15px;
+			border: none;
+		}
+
+		.buttons {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 8px;
+		}
+
+		.btn {
+			padding: 15px;
+			border-radius: 10px;
+			font-size: 1.25rem;
+			font-weight: 500;
+			text-align: center;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.btn:hover {
+			filter: brightness(110%);
+		}
+
+		.btn:active {
+			transform: scale(0.95);
+		}
+
+		.num-btn {
+			background-color: #505050;
+			color: white;
+		}
+
+		.op-btn {
+			background-color: #f5a623;
+			color: white;
+		}
+
+		.clear-btn,
+		.eq-btn {
+			background-color: #d4d4d2;
+			color: black;
+		}
+
+		.zero-btn {
+			grid-column: span 2;
+		}
+	</style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen">
+	<div class="calculator">
+		<input type="text" id="display" readonly value="0">
+		<div class="buttons">
+			<div class="btn clear-btn" onclick="clearDisplay()">C</div>
+			<div class="btn op-btn" onclick="appendToDisplay('/')">÷</div>
+			<div class="btn op-btn" onclick="appendToDisplay('*')">×</div>
+			<div class="btn op-btn" onclick="appendToDisplay('-')">-</div>
+			<div class="btn num-btn" onclick="appendToDisplay('7')">7</div>
+			<div class="btn num-btn" onclick="appendToDisplay('8')">8</div>
+			<div class="btn num-btn" onclick="appendToDisplay('9')">9</div>
+			<div class="btn op-btn" onclick="appendToDisplay('+')">+</div>
+			<div class="btn num-btn" onclick="appendToDisplay('4')">4</div>
+			<div class="btn num-btn" onclick="appendToDisplay('5')">5</div>
+			<div class="btn num-btn" onclick="appendToDisplay('6')">6</div>
+			<div class="btn eq-btn" onclick="calculate()">=</div>
+			<div class="btn num-btn" onclick="appendToDisplay('1')">1</div>
+			<div class="btn num-btn" onclick="appendToDisplay('2')">2</div>
+			<div class="btn num-btn" onclick="appendToDisplay('3')">3</div>
+			<div class="btn num-btn zero-btn" onclick="appendToDisplay('0')">0</div>
+			<div class="btn num-btn" onclick="appendToDisplay('.')">.</div>
+		</div>
+	</div>
+
+	<script>
+		let display = document.getElementById('display')
+		let currentInput = '0'
+		let previousInput = null
+		let operation = null
+
+		function appendToDisplay(value) {
+			if (currentInput === '0' && value !== '.') {
+				currentInput = value
+			} else {
+				currentInput += value
+			}
+			display.value = currentInput
+		}
+
+		function clearDisplay() {
+			currentInput = '0'
+			previousInput = null
+			operation = null
+			display.value = '0'
+		}
+
+		function calculate() {
+			if (previousInput === null || operation === null) return
+			let result = 0
+			const prev = parseFloat(previousInput)
+			const curr = parseFloat(currentInput)
+			switch (operation) {
+				case '+': result = prev + curr; break
+				case '-': result = prev - curr; break
+				case '*': result = prev * curr; break
+				case '/':
+					if (curr === 0) {
+						display.value = 'Xato'
+						setTimeout(clearDisplay, 1000)
+						return
+					}
+					result = prev / curr
+					break
+			}
+			currentInput = result.toString()
+			display.value = currentInput
+			previousInput = null
+			operation = null
+		}
+
+		document.querySelectorAll('.op-btn').forEach(btn => {
+			btn.addEventListener('click', function () {
+				if (previousInput === null) {
+					previousInput = currentInput
+				} else if (operation) {
+					calculate()
+					previousInput = currentInput
+				}
+				operation = this.textContent === '÷' ? '/' : this.textContent
+				currentInput = '0'
+			})
+		})
+
+		display.value = '0';
+	</script>
+</body>
+
+</html>
